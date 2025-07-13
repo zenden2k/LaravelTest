@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\OrderServiceInterface;
-use App\Http\Requests\CatalogRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderRequest;
-use Illuminate\Http\JsonResponse;
+use App\Http\Resources\OrderResource;
 use Illuminate\Support\Arr;
 
-class OrderController extends BaseController
+class OrderController extends Controller
 {
     protected OrderServiceInterface $orderService;
 
@@ -18,12 +18,12 @@ class OrderController extends BaseController
     }
 
     // POST /create-order
-    public function store(CreateOrderRequest $request): JsonResponse
+    public function store(CreateOrderRequest $request): OrderResource
     {
         $validated = $request->validated();
         $userId = Arr::get($validated, 'user_id');
         $products = Arr::get($validated, 'products');
-        $products = $this->orderService->createOrder($userId, $products);
-        return $this->sendResponse($products);
+        $order = $this->orderService->createOrder($userId, $products);
+        return new OrderResource($order);
     }
 }

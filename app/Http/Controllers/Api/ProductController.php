@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\ProductServiceInterface;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CatalogRequest;
-use Illuminate\Http\JsonResponse;
+use App\Http\Resources\ProductResource;
 
-class ProductController extends BaseController
+class ProductController extends Controller
 {
     protected ProductServiceInterface $productService;
 
@@ -16,9 +17,9 @@ class ProductController extends BaseController
     }
 
     // GET /catalog
-    public function index(CatalogRequest $request): JsonResponse
+    public function index(CatalogRequest $request)
     {
         $products = $this->productService->getAllProducts($request->validated());
-        return $this->sendResponse($products);
+        return ProductResource::collection($products);
     }
 }

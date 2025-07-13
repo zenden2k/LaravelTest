@@ -27,6 +27,7 @@ class ProductService implements ProductServiceInterface
         if (Arr::has($filters, 'max_price')) {
             $query->where('price', '<=', $filters['max_price']);
         }
+        $query->with('category');
 
         $sortField = Arr::get($filters, 'sort', 'id');
         $sortDirection = Arr::get($filters, 'direction', 'asc');
