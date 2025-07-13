@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->decimal('price');
-            $table->unsignedInteger('quantity');
+            $table->unsignedInteger('quantity')->default(1);
+            $table->unsignedInteger('reserved_quantity')->default(0);
             $table->timestamps();
         });
     }
