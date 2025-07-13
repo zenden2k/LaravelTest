@@ -8,5 +8,5 @@ interface OrderServiceInterface
 {
     public function createOrder(int $userId, array $items): Order;
 
-    public function approveOrder(Order $order);
+    public function approveOrder(int $orderId);
 }

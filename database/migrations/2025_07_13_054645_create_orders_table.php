@@ -14,8 +14,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->tinyInteger('status')->comment('0 - new, 1 - approved, 2 - rejected');
+            $table->tinyInteger('status')->comment('0 - new, 1 - approved, 2 - canceled');
             $table->foreignIdFor(User::class);
+            $table->decimal('total_amount');
             $table->timestamps();
         });
     }

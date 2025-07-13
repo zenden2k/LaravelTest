@@ -6,14 +6,13 @@ class InsufficientFundsException extends OrderException
 {
     public function __construct()
     {
-        parent::__construct('Недостаточно средств у покупателя', 400);
+        parent::__construct('Недостаточно средств у покупателя');
     }
 
     public function toArray(): array
     {
         return [
-            'error' => 'insufficient_funds',
-            'message' => $this->getMessage()
+            'error' => 'insufficient_funds'
         ];
     }
 }

@@ -9,16 +9,26 @@ class InsufficientQuantityException extends OrderException
     public function __construct(int $productId)
     {
         $this->productId = $productId;
-        parent::__construct("Недостаточно товара с ID {$productId} на складе", 404);
+        parent::__construct("Недостаточно товара с ID {$productId} на складе");
     }
 
     public function toArray(): array
     {
         return [
             'error' => 'insufficient_quantity',
-            'message' => $this->getMessage(),
             'product_id' => $this->productId,
         ];
     }
 
+    /**
+     * Get the exception's context information.
+     *
+     * @return array<string, mixed>
+     */
+    public function context(): array
+    {
+        return [
+            'product_id' => $this->productId
+        ];
+    }
 }

@@ -16,8 +16,19 @@ class ProductNotFoundException extends OrderException
     {
         return [
             'error' => 'product_not_found',
-            'message' => $this->getMessage(),
             'product_id' => $this->productId,
+        ];
+    }
+
+    /**
+     * Get the exception's context information.
+     *
+     * @return array<string, mixed>
+     */
+    public function context(): array
+    {
+        return [
+            'product_id' => $this->productId
         ];
     }
 }

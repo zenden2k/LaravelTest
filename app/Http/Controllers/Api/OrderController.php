@@ -6,6 +6,7 @@ use App\Contracts\OrderServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderRequest;
 use App\Http\Resources\OrderResource;
+use App\Models\Order;
 use Illuminate\Support\Arr;
 
 class OrderController extends Controller
@@ -18,7 +19,7 @@ class OrderController extends Controller
     }
 
     // POST /create-order
-    public function store(CreateOrderRequest $request): OrderResource
+    public function createOrder(CreateOrderRequest $request): OrderResource
     {
         $validated = $request->validated();
         $userId = Arr::get($validated, 'user_id');
@@ -26,4 +27,11 @@ class OrderController extends Controller
         $order = $this->orderService->createOrder($userId, $products);
         return new OrderResource($order);
     }
+
+    // POST /approve-order/{id}
+    public function approveOrder(int $orderId): OrderResource
+    {
+        return new OrderResource($this->orderService->approveOrder($orderId));
+    }
+
 }

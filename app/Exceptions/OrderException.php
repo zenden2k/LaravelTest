@@ -2,9 +2,6 @@
 
 namespace App\Exceptions;
 
-abstract class OrderException extends \Exception
+abstract class OrderException extends ApiException
 {
-    protected $code = 400;
-
-    abstract public function toArray(): array;
 }

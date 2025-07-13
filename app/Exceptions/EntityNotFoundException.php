@@ -2,8 +2,17 @@
 
 namespace App\Exceptions;
 
-class EntityNotFoundException extends \Exception
+class EntityNotFoundException extends OrderException
 {
-    protected $message = 'Сущность не найдена';
-    protected $code = 404;
+    public function __construct($message)
+    {
+        parent::__construct($message, 404);
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'error' => 'entity_not_found'
+        ];
+    }
 }
