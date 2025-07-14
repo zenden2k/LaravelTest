@@ -92,7 +92,7 @@ class OrderService implements OrderServiceInterface
      * @return mixed
      * @throws OrderException|\Throwable
      */
-    public function approveOrder(int $orderId)
+    public function approveOrder(int $orderId): Order
     {
         return $this->db->transaction(function () use ($orderId) {
             $order = Order::lockForUpdate()->find($orderId);
@@ -102,6 +102,7 @@ class OrderService implements OrderServiceInterface
             if ($order->status != OrderStatus::NEW) {
                 throw new InvalidOrderStatusException($orderId);
             }
+            /** @var User $user */
             $user = User::lockForUpdate()->find($order->user_id);
             if ($user === null) {
                 throw new EntityNotFoundException("Пользователь не найден");
@@ -112,12 +113,20 @@ class OrderService implements OrderServiceInterface
             }
 
             foreach ($order->products()->lockForUpdate()->get() as $product) {
-                $product->decrement('reserved_quantity', $product->pivot->quantity);
-                $product->decrement('quantity', $product->pivot->quantity);
+                $this->db->table($product->getTable())
+                    ->where('id', $product->id)
+                    ->decrementEach([
+                        'reserved_quantity' => $product->pivot->quantity,
+                        'quantity' => $product->pivot->quantity
+                    ]);
             }
 
-            $user->decrement('reserved_money', $order->total_amount);
-            $user->decrement('money', $order->total_amount);
+            $this->db->table($user->getTable())
+                ->where('id', $user->id)
+                ->decrementEach([
+                    'reserved_money' => $order->total_amount,
+                    'money' => $order->total_amount
+                ]);
 
             $order->status = OrderStatus::APPROVED;
             $order->save();

@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 
 class ProductService implements ProductServiceInterface
 {
-    public function getAllProducts($filters)
+    public function getAllProducts(array $filters)
     {
         $query = Product::query();
 
