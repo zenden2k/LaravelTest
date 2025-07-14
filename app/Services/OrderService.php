@@ -108,11 +108,15 @@ class OrderService implements OrderServiceInterface
                 throw new EntityNotFoundException("Пользователь не найден");
             }
 
-            if ($user->reserved_money < $order->total_amount) {
+            if ($user->reserved_money < $order->total_amount || $user->money < $order->total_amount) {
                 throw new InsufficientFundsException();
             }
 
             foreach ($order->products()->lockForUpdate()->get() as $product) {
+                if ($product->reserved_quantity < $product->pivot->quantity
+                    || $product->quantity < $product->pivot->quantity) {
+                    throw new InsufficientQuantityException($product->id);
+                }
                 $this->db->table($product->getTable())
                     ->where('id', $product->id)
                     ->decrementEach([

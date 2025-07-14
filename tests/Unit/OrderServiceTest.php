@@ -198,7 +198,48 @@ class OrderServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_exception_when_non_existent_order()
+    public function it_throws_exception_when_approving_order_with_insufficient_quantity()
+    {
+        $user = User::factory()->create([
+            'money' => 1000.0,
+            'reserved_money' => 400.0
+        ]);
+
+        $category = Category::factory()->create();
+
+        $product1 = Product::factory()->create([
+            'price' => 100.0,
+            'quantity' => 10,
+            'reserved_quantity' => 1
+        ]);
+
+        $product2 = Product::factory()->create([
+            'price' => 50.0,
+            'quantity' => 5,
+            'reserved_quantity' => 2
+        ]);
+
+        $order = Order::factory()->withProducts([
+            [
+                'product_id' => $product1->id,
+                'quantity' => 3
+            ],
+            [
+                'product_id' => $product2->id,
+                'quantity' => 2
+            ],
+        ])->create([
+            'user_id' => $user->id,
+            'status' => OrderStatus::NEW
+        ]);
+
+        $this->expectException(InsufficientQuantityException::class);
+
+        $this->orderService->approveOrder($order->id);
+    }
+
+    #[Test]
+    public function it_throws_exception_when_approving_non_existent_order()
     {
         $this->expectException(EntityNotFoundException::class);
 
@@ -221,7 +262,7 @@ class OrderServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_exception_when_invalid_status2()
+    public function it_throws_exception_when_invalid_status_2()
     {
         $user = User::factory()->create();
 
@@ -236,7 +277,7 @@ class OrderServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_exception_when_insufficient_reserved_funds()
+    public function it_throws_exception_when_approving_insufficient_reserved_funds()
     {
         $user = User::factory()->create([
             'money' => 1000.0,
@@ -247,6 +288,25 @@ class OrderServiceTest extends TestCase
             'user_id' => $user->id,
             'status' => OrderStatus::NEW,
             'total_amount' => 100.0
+        ]);
+
+        $this->expectException(InsufficientFundsException::class);
+
+        $this->orderService->approveOrder($order->id);
+    }
+
+    #[Test]
+    public function it_throws_exception_when_approving_insufficient_user_funds()
+    {
+        $user = User::factory()->create([
+            'money' => 100.0,
+            'reserved_money' => 500.0
+        ]);
+
+        $order = Order::factory()->create([
+            'user_id' => $user->id,
+            'status' => OrderStatus::NEW,
+            'total_amount' => 200.0
         ]);
 
         $this->expectException(InsufficientFundsException::class);

@@ -13,7 +13,7 @@ class ProductService implements ProductServiceInterface
         $query = Product::query();
 
         if (Arr::has($filters, 'name')) {
-            $query->whereLike('name', $filters['name']);
+            $query->whereLike('name', '%'. $filters['name'] . '%');
         }
 
         if (Arr::has($filters, 'category_id')) {
